@@ -1,0 +1,236 @@
+<?xml version="1.0"?>
+
+<project name="PetStore" default="core" basedir=".">
+
+    <!-- path to root -->
+    <property name="home.dir" value="..\"/>
+    <property name="config.dir" value="${home.dir}/config"/>
+    <property name="lib.dir" value="${home.dir}/lib"/>
+    <property name="build.dir" value="${home.dir}/build"/>
+    <property name="deploy.dir" value="${config.dir}/deploy"/>
+    <property name="resource.dir" value="${config.dir}/resource"/>
+
+    <property name="classes.dir" value="${home.dir}/classes"/>
+    <property name="src.dir" value="${home.dir}/src"/>
+
+    <property name="test.dir" value="${home.dir}/test"/>
+    <property name="test.classes.dir" value="${test.dir}/classes"/>
+    <property name="test.src.dir" value="${test.dir}/src"/>
+
+    <!-- Jars -->
+    <property name="client.jar" value="${build.dir}/client.jar"/>
+    <property name="server.jar" value="${build.dir}/server.jar"/>
+    <property name="common.jar" value="${build.dir}/common.jar"/>
+
+    <!-- Wars -->
+    <property name="web.war" value="${build.dir}/petstore.war"/>
+    <property name="admin.war" value="${build.dir}/adminps.war"/>
+    <property name="barkbank.war" value="${build.dir}/barkbank.war"/>
+
+    <!-- Signed -->
+    <property name="sign.alias" value="adminAlias"/>
+    <property name="sign.pass" value="adminPassword"/>
+    <property name="sign.keystore" value="${build.dir}/keystore"/>
+    <property name="signed.client.jar" value="signed-client.jar"/>
+    <property name="signed.common.jar" value="signed-common.jar"/>
+
+    <!-- External application -->
+    <property name="tomcat.home" value="C:/Tomcat5.0"/>
+    <property name="tomcat.deploy.dir" value="${tomcat.home}/webapps"/>
+
+    <!-- Classes and Jars used to compile and test the application -->
+    <path id="classpath">
+        <pathelement location="${classes.dir}"/>
+        <pathelement location="${test.classes.dir}"/>
+        <pathelement location="${lib.dir}\xunit\junit.jar"/>
+        <pathelement location="${lib.dir}\xunit\httpunit.jar"/>
+        <pathelement location="${lib.dir}\xunit\nekohtml.jar"/>
+        <pathelement location="${lib.dir}\xunit\xercesImpl.jar"/>
+        <pathelement location="${lib.dir}\xunit\xmlParseAPIs.jar"/>
+        <pathelement location="${lib.dir}\mysql-connector.jar"/>
+        <pathelement location="${lib.dir}\servlet-api.jar"/>
+        <pathelement location="${lib.dir}\jsp-api.jar"/>
+        <pathelement location="${lib.dir}\dom4j.jar"/>
+    </path>
+
+    <!-- Removes the build directories -->
+    <target name="clean">
+        <echo message="Cleans the environment"/>
+        <delete dir="${classes.dir}"/>
+        <delete dir="${test.classes.dir}"/>
+        <delete dir="${build.dir}"/>
+    </target>
+
+    <!-- Creates or updates the Petstore database structure -->
+    <target name="databaseStructure">
+        <sql src="${config.dir}/structure.sql"
+            driver="com.mysql.jdbc.Driver"
+            url="jdbc:mysql://localhost:3306/petstore"
+            userid="root"
+            password="">
+            <classpath refid="classpath"/>
+        </sql>
+    </target>
+
+    <!-- Inserts data to the Petstore database -->
+    <target name="databaseData">
+        <sql src="${config.dir}/data.sql"
+            driver="com.mysql.jdbc.Driver"
+            url="jdbc:mysql://localhost:3306/petstore"
+            userid="root"
+            password="">
+            <classpath refid="classpath"/>
+        </sql>
+    </target>
+
+    <!-- Compiles source code -->
+    <target name="compile">
+        <echo message="Compile the classes"/>
+        <mkdir dir="${classes.dir}"/>
+        <javac srcdir="${src.dir}"
+            destdir="${classes.dir}">
+            <classpath refid="classpath"/>
+        </javac>
+    </target>
+
+    <!-- creates RMI stubs and skeletons -->
+    <target name="rmic" depends="compile">
+        <echo message="Creates RMI stubs and skeletons"/>
+        <rmic classname="com.yaps.petstore.server.service.catalog.CatalogService" base="${classes.dir}"/>
+        <rmic classname="com.yaps.petstore.server.service.customer.CustomerService" base="${classes.dir}"/>
+        <rmic classname="com.yaps.petstore.server.service.order.OrderService" base="${classes.dir}"/>
+    </target>
+
+    <!-- Creates the client and the server jar files -->
+    <target name="jar" depends="rmic">
+        <mkdir dir="${build.dir}"/>
+        <echo message="Creates the PetStore Common jar"/>
+        <jar jarfile="${common.jar}">
+            <fileset dir="${classes.dir}">
+                <include name="com/yaps/petstore/common/**/*.class"/>
+            </fileset>
+        </jar>
+        <echo message="Creates the PetStore Client Application"/>
+        <jar jarfile="${client.jar}">
+            <fileset dir="${classes.dir}">
+                <include name="com/yaps/petstore/client/**/*.class"/>
+                <include name="com/yaps/petstore/server/service/**/*Stub.class"/>
+                <include name="com/yaps/petstore/server/service/**/*Remote.class"/>
+            </fileset>
+        </jar>
+        <echo message="Creates the PetStore Server Application"/>
+        <jar jarfile="${server.jar}">
+            <fileset dir="${classes.dir}">
+                <include name="com/yaps/petstore/server/**/*.class"/>
+            </fileset>
+        </jar>
+    </target>
+
+    <!-- Creates the webapp war file -->
+    <target name="war" depends="rmic">
+        <mkdir dir="${build.dir}"/>
+        <echo message="Creates the PetStore Web Application"/>
+        <war destfile="${web.war}" webxml="${deploy.dir}/web/web.xml">
+            <fileset dir="${src.dir}/com/yaps/petstore/web/docroot">
+                <include name="**/*.jsp"/>
+                <include name="**/*.gif"/>
+                <include name="**/*.jpg"/>
+            </fileset>
+            <webinf dir="${deploy.dir}/web">
+                <include name="petstore.tld"/>
+            </webinf>
+            <lib dir="${lib.dir}">
+                <include name="*.jar"/>
+            </lib>
+            <classes dir="${classes.dir}">
+                <include name="com/yaps/petstore/web/**/*.class"/>
+                <include name="com/yaps/petstore/server/service/customer/*Stub.class"/>
+                <include name="com/yaps/petstore/server/service/customer/*Remote.class"/>
+                <include name="com/yaps/petstore/server/service/catalog/*Stub.class"/>
+                <include name="com/yaps/petstore/server/service/catalog/*Remote.class"/>
+                <include name="com/yaps/petstore/common/**/*.class"/>
+            </classes>
+        </war>
+    </target>
+
+    <!-- Creates the Bank webapp war file -->
+    <target name="bank" depends="rmic">
+        <mkdir dir="${build.dir}"/>
+        <echo message="Creates the Bank Web Application"/>
+        <war destfile="${barkbank.war}" webxml="${deploy.dir}/barkbank/web.xml">
+            <fileset dir="${src.dir}/com/barkbank/verifier/">
+                <include name="**/*.html"/>
+                <include name="**/*.gif"/>
+            </fileset>
+            <classes dir="${classes.dir}">
+                <include name="com/barkbank/**/*.class"/>
+            </classes>
+            <lib dir="${lib.dir}">
+                <include name="dom4j.jar"/>
+                <include name="jaxen.jar"/>
+            </lib>
+        </war>
+    </target>
+
+    <!-- Creates the Admin webapp war file -->
+    <target name="admin" depends="jar">
+        <echo message="Sign the client Jar"/>
+        <delete file="${sign.keystore}"/>
+        <!-- Generates a key -->
+        <genkey alias="${sign.alias}"
+            storepass="${sign.pass}"
+            keystore="${sign.keystore}"
+            dname="CN=YAPS, OU=YAPS PetStore, O=YAPS PetStore, C=US"/>
+        <!-- Sign the jars with the generated key -->
+        <signjar jar="${client.jar}"
+            signedjar="${build.dir}/${signed.client.jar}"
+            storepass="${sign.pass}"
+            alias="${sign.alias}"
+            keystore="${sign.keystore}"/>
+        <signjar jar="${common.jar}"
+            signedjar="${build.dir}/${signed.common.jar}"
+            storepass="${sign.pass}"
+            alias="${sign.alias}"
+            keystore="${sign.keystore}"/>
+
+        <echo message="Creates the Admin Web Application"/>
+        <war destfile="${admin.war}" webxml="${deploy.dir}/admin/web.xml">
+            <fileset dir="${src.dir}/com/yaps/admin/">
+                <include name="**/*.html"/>
+                <include name="**/*.gif"/>
+                <include name="**/*.jnlp"/>
+            </fileset>
+            <fileset dir="${build.dir}">
+                <include name="${signed.client.jar}"/>
+                <include name="${signed.common.jar}"/>
+            </fileset>
+        </war>
+    </target>
+
+    <!-- Deploys the webapp war file -->
+    <target name="deploy" depends="war,bank,admin">
+        <copy file="${web.war}" todir="${tomcat.deploy.dir}"/>
+        <copy file="${barkbank.war}" todir="${tomcat.deploy.dir}"/>
+        <copy file="${admin.war}" todir="${tomcat.deploy.dir}"/>
+    </target>
+
+    <!-- Test -->
+    <target name="test" depends="compile">
+        <echo message="Compile the test classes"/>
+        <mkdir dir="${test.classes.dir}"/>
+        <javac srcdir="${test.src.dir}"
+            destdir="${classes.dir}">
+            <classpath refid="classpath"/>
+        </javac>
+        <echo message="Test the application"/>
+        <junit printsummary="on">
+            <formatter type="plain" usefile="false"/>
+            <test name="AllTests"/>
+            <classpath refid="classpath"/>
+        </junit>
+    </target>
+
+    <!-- Main targets -->
+    <target name="core" depends="clean,jar,war,bank,admin"/>
+
+</project>

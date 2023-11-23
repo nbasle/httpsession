@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
+    version="2.4">
+
+    <display-name>Petstore Web</display-name>
+
+    <!-- Servlet Configuration -->
+    <servlet>
+        <servlet-name>CreateCustomer</servlet-name>
+        <display-name>CreateCustomerServlet</display-name>
+        <servlet-class>com.yaps.petstore.web.servlet.CreateCustomerServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>CreateNewAccount</servlet-name>
+        <display-name>CreateNewAccountServlet</display-name>
+        <servlet-class>com.yaps.petstore.web.servlet.CreateNewAccountServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>UpdateCustomer</servlet-name>
+        <display-name>UpdateCustomerServlet</display-name>
+        <servlet-class>com.yaps.petstore.web.servlet.UpdateCustomerServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>FindItem</servlet-name>
+        <display-name>FindItemServlet</display-name>
+        <servlet-class>com.yaps.petstore.web.servlet.FindItemServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>FindItems</servlet-name>
+        <display-name>FindItemsServlet</display-name>
+        <servlet-class>com.yaps.petstore.web.servlet.FindItemsServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>SearchItems</servlet-name>
+        <display-name>SearchItemsServlet</display-name>
+        <servlet-class>com.yaps.petstore.web.servlet.SearchItemsServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>FindProducts</servlet-name>
+        <display-name>FindProductsServlet</display-name>
+        <servlet-class>com.yaps.petstore.web.servlet.FindProductsServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>SignOn</servlet-name>
+        <display-name>SignOnServlet</display-name>
+        <servlet-class>com.yaps.petstore.web.servlet.SignOnServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>SignOff</servlet-name>
+        <display-name>SignOffServlet</display-name>
+        <servlet-class>com.yaps.petstore.web.servlet.SignOffServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>CreditCard</servlet-name>
+        <display-name>CreditCardServlet</display-name>
+        <servlet-class>com.bank.verifier.CreditCardServlet</servlet-class>
+    </servlet>
+
+    <!-- Servlet Mapping -->
+    <servlet-mapping>
+        <servlet-name>CreateCustomer</servlet-name>
+        <url-pattern>/createcustomer</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>CreateNewAccount</servlet-name>
+        <url-pattern>/createnewaccount</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>UpdateCustomer</servlet-name>
+        <url-pattern>/updatecustomer</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>FindItem</servlet-name>
+        <url-pattern>/finditem</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>FindItems</servlet-name>
+        <url-pattern>/finditems</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>SearchItems</servlet-name>
+        <url-pattern>/searchitems</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>FindProducts</servlet-name>
+        <url-pattern>/findproducts</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>SignOn</servlet-name>
+        <url-pattern>/signon</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>SignOff</servlet-name>
+        <url-pattern>/signoff</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>CreditCard</servlet-name>
+        <url-pattern>/creditcard</url-pattern>
+    </servlet-mapping>
+
+    <!-- Welcome Page -->
+    <welcome-file-list>
+        <welcome-file>index.jsp</welcome-file>
+    </welcome-file-list>
+
+</web-app>

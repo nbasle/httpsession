@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+
+<project name="Hello PetStore" default="core" basedir=".">
+
+    <!-- path to root -->
+    <property name="home.dir" value="."/>
+    <property name="classes.dir" value="${home.dir}/classes"/>
+    <property name="src.dir" value="${home.dir}"/>
+    <property name="build.dir" value="${home.dir}/build"/>
+    <property name="lib.dir" value="${home.dir}/../lib"/>
+
+    <!-- Files -->
+    <property name="web.war" value="${build.dir}/hellops.war"/>
+
+    <!-- External application -->
+    <property name="tomcat.home" value="D:/Java/jakarta-tomcat-5.0.28"/>
+    <property name="tomcat.deploy.dir" value="${tomcat.home}/webapps"/>
+    <property name="tomcat.config.dir" value="${tomcat.home}/conf"/>
+
+    <path id="classpath">
+        <pathelement location="${classes.dir}"/>
+    </path>
+
+    <!-- Removes the build directory -->
+    <target name="clean">
+        <echo message="Cleans the environment"/>
+        <delete dir="${build.dir}"/>
+    </target>
+
+    <!-- Creates the webapp war file -->
+    <target name="war">
+        <mkdir dir="${build.dir}"/>
+        <echo message="Creates the Hello PetStore Web Application"/>
+        <war destfile="${web.war}" webxml="web.xml">
+            <fileset dir="${src.dir}">
+                <include name="**/*.jsp"/>
+            </fileset>
+        </war>
+    </target>
+
+    <!-- Creates the webapp war file -->
+    <target name="deploy" depends="war">
+        <copy file="${web.war}" todir="${tomcat.deploy.dir}"/>
+    </target>
+
+    <!-- Main targets -->
+    <target name="core" depends="clean,war"/>
+
+</project>
